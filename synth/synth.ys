@@ -1,0 +1,25 @@
+# -----------------------------------------------------------------------------
+# Project ID: 24BVD1046
+# File      : synth.ys
+# -----------------------------------------------------------------------------
+
+# Use the 'read_verilog' command. If it continues to error, Yosys is 
+# expecting the files to be read as arguments, not a Tcl-like command.
+# Let's try this syntax which is more "Yosys-native":
+
+read_verilog rtl/cdc_sync.sv
+read_verilog rtl/gray_encoder.sv
+read_verilog rtl/axi_level_shifter.sv
+read_verilog rtl/async_fifo.sv
+read_verilog rtl/axi_cdc_bridge.sv
+
+# 2. Elaborate
+hierarchy -check -top axi_cdc_bridge
+
+# 3. Synth
+proc; opt; fsm; opt; memory; opt; techmap; opt
+synth -top axi_cdc_bridge
+
+# 4. Output
+write_json synth/netlist.json
+show -format svg -prefix synth/axi_cdc_bridge_schematic
